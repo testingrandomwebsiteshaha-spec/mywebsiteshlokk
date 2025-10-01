@@ -88,7 +88,7 @@
             height: 40px;
             background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
             border-radius: 20px 20px 0 0;
-            transition: left 0.05s ease;
+            transition: left 0.1s ease;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             z-index: 10;
         }
@@ -110,7 +110,6 @@
             color: #ff6b6b;
             user-select: none;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s ease;
             z-index: 5;
         }
 
@@ -281,7 +280,7 @@
     
     <div class="container">
         <div class="header">
-            <h1>💖 For My Ahana 💖</h1>
+            <h1>💖 For My Pyaaariiii Ahuuuuuu 💖</h1>
             <p>You mean everything to me, and I want to make things right</p>
         </div>
 
@@ -316,231 +315,290 @@
 
         <div class="love-message">
             <h2>You Complete Me Ahana 💕</h2>
-            <p>No matter what happens, my love for you grows stronger every day. You are my sunshine, my happiness, and my sbkuchhhh💕💕💕💕💕 I LOVEEEEEEE YOUUUUUUUUUU AHANAAAAAAA 💕💕💕💕💕💕🫂🫂🫂🧿🧿🧿🧿🧿🧿.</p>
+            <p>No matter what happens, my love for you grows stronger every day. You are my sunshine, my happiness, and my everything.</p>
             <p style="margin-top: 15px; font-style: italic;">"In your smile, I see something more beautiful than the stars." - Your Shlok</p>
         </div>
     </div>
 
     <audio id="backgroundMusic" loop>
-        <source src="Blue - (Raag.Fm).mp3" type="audio/mpeg">
+        <source src="https://49983-inrpamf2zbda2r6q2j36s.e2b.app/files?username=user&path=Blue+-+%28Raag.Fm%29.mp3&signature=v1_5WyRqiENNtRkNV%2B7xCCUmuvHydwEvbR%2Bzj0uNtQ9DmM" type="audio/mpeg">
     </audio>
 
     <script>
-        let score = 0;
-        let gameActive = false;
-        let hearts = [];
-        let basketPosition = 0;
-        const totalHearts = 25;
-        const gameContainer = document.getElementById('gameContainer');
-        const basket = document.getElementById('basket');
-        const scoreDisplay = document.getElementById('score');
-        const gameOverScreen = document.getElementById('gameOver');
-        const backgroundMusic = document.getElementById('backgroundMusic');
-        const musicToggle = document.getElementById('musicToggle');
+/* Improved game script:
+   - fixes timeout leaks
+   - uses real bounding boxes for collision
+   - adds pointer (mouse+touch) and keyboard controls
+   - manages RAF loop more cleanly
+   - improves audio toggle / initialization
+*/
 
-        // Music control
-        let musicPlaying = false;
-        musicToggle.addEventListener('click', function() {
-            if (musicPlaying) {
-                backgroundMusic.pause();
-                musicToggle.textContent = '🔇';
-            } else {
-                backgroundMusic.play().catch(e => {
-                    console.log('Audio play failed:', e);
-                });
-                musicToggle.textContent = '🔊';
-            }
-            musicPlaying = !musicPlaying;
+let score = 0;
+let gameActive = false;
+let hearts = [];
+let basketPosition = 0;
+const totalHearts = 25;
+let gameLoopId = null;
+let gameLoopRunning = false;
+const spawnTimeouts = []; // track setTimeout IDs so we can clear them
+
+// DOM
+const gameContainer = document.getElementById('gameContainer');
+const basket = document.getElementById('basket');
+const scoreDisplay = document.getElementById('score');
+const gameOverScreen = document.getElementById('gameOver');
+const backgroundMusic = document.getElementById('backgroundMusic');
+const musicToggle = document.getElementById('musicToggle');
+
+// ---------- Audio control ----------
+let musicPlaying = false;
+musicToggle.textContent = '🔇'; // start as muted icon
+
+musicToggle.addEventListener('click', function () {
+    if (musicPlaying) {
+        backgroundMusic.pause();
+        musicToggle.textContent = '🔇';
+        musicPlaying = false;
+    } else {
+        backgroundMusic.play().then(() => {
+            musicPlaying = true;
+            musicToggle.textContent = '🔊';
+        }).catch((e) => {
+            console.log('Audio play failed:', e);
         });
+    }
+});
 
-        // Auto-play music on first interaction
-        document.addEventListener('click', function initAudio() {
-            if (!musicPlaying) {
-                backgroundMusic.play().then(() => {
-                    musicPlaying = true;
-                    musicToggle.textContent = '🔊';
-                }).catch(e => {
-                    console.log('Auto-play failed:', e);
-                });
-            }
-        });
+// Attempt to start audio on first user gesture, then remove listener(s)
+function tryInitAudio() {
+    if (musicPlaying) return;
+    backgroundMusic.play().then(() => {
+        musicPlaying = true;
+        musicToggle.textContent = '🔊';
+    }).catch(() => {});
+    document.removeEventListener('click', tryInitAudio);
+    document.removeEventListener('keydown', tryInitAudio);
+}
+document.addEventListener('click', tryInitAudio);
+document.addEventListener('keydown', tryInitAudio);
 
-        // Create floating background hearts
-        function createFloatingHearts() {
-            const container = document.getElementById('floatingHearts');
-            for (let i = 0; i < 15; i++) {
-                const heart = document.createElement('div');
-                heart.className = 'floating-heart';
-                heart.innerHTML = '💖';
-                heart.style.left = Math.random() * 100 + 'vw';
-                heart.style.animationDelay = Math.random() * 6 + 's';
-                heart.style.fontSize = (Math.random() * 15 + 10) + 'px';
-                container.appendChild(heart);
-            }
-        }
+// ---------- Floating hearts background ----------
+function createFloatingHearts() {
+    const container = document.getElementById('floatingHearts');
+    container.innerHTML = '';
+    for (let i = 0; i < 15; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'floating-heart';
+        heart.innerHTML = '💖';
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDelay = Math.random() * 6 + 's';
+        heart.style.fontSize = (Math.random() * 15 + 10) + 'px';
+        container.appendChild(heart);
+    }
+}
 
-        function startGame() {
-            if (gameActive) return;
-            
-            gameActive = true;
-            score = 0;
-            hearts = [];
+// ---------- Heart creation ----------
+function createHeart() {
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    heart.innerHTML = '💖';
+    const maxLeft = Math.max(0, gameContainer.clientWidth - 30);
+    const startX = Math.random() * maxLeft;
+    heart.style.left = startX + 'px';
+    heart.style.top = '-30px';
+    gameContainer.appendChild(heart);
+
+    const heartObj = {
+        element: heart,
+        x: startX,
+        y: -30,
+        speed: Math.random() * 2 + 1
+    };
+
+    hearts.push(heartObj);
+
+    // ensure the game loop is running so the heart will animate
+    if (!gameLoopRunning) {
+        gameLoopRunning = true;
+        updateGame();
+    }
+}
+
+// ---------- Game loop & collision ----------
+function updateGame() {
+    // schedule next frame first (so we have an id to cancel if needed)
+    gameLoopId = requestAnimationFrame(updateGame);
+
+    // if nothing is active and no hearts, stop loop
+    if (!gameActive && hearts.length === 0) {
+        gameLoopRunning = false;
+        cancelAnimationFrame(gameLoopId);
+        return;
+    }
+
+    const containerRect = gameContainer.getBoundingClientRect();
+    for (let i = hearts.length - 1; i >= 0; i--) {
+        const heart = hearts[i];
+        heart.y += heart.speed;
+        heart.element.style.top = heart.y + 'px';
+
+        const heartRect = heart.element.getBoundingClientRect();
+        const basketRect = basket.getBoundingClientRect();
+
+        // collision test using bounding boxes
+        const collided =
+            heartRect.bottom >= basketRect.top &&
+            heartRect.top <= basketRect.bottom &&
+            heartRect.right >= basketRect.left &&
+            heartRect.left <= basketRect.right;
+
+        if (collided) {
+            // caught
+            heart.element.remove();
+            hearts.splice(i, 1);
+            score++;
             scoreDisplay.textContent = score;
-            gameOverScreen.style.display = 'none';
-            
-            // Clear existing hearts
-            document.querySelectorAll('.heart').forEach(heart => heart.remove());
-            
-            // Create hearts with delays
-            for (let i = 0; i < totalHearts; i++) {
-                setTimeout(() => createHeart(), i * 1000);
+
+            if (score >= totalHearts) {
+                // stop spawning and show gameover
+                spawnTimeouts.forEach(id => clearTimeout(id));
+                spawnTimeouts.length = 0;
+                gameActive = false;
+                setTimeout(() => {
+                    gameOverScreen.style.display = 'block';
+                }, 500);
             }
+            continue;
         }
 
-        function createHeart() {
-            if (!gameActive) return;
-
-            const heart = document.createElement('div');
-            heart.className = 'heart';
-            heart.innerHTML = '💖';
-            const maxLeft = gameContainer.offsetWidth - 30;
-            heart.style.left = Math.random() * maxLeft + 'px';
-            heart.style.top = '-30px';
-            
-            gameContainer.appendChild(heart);
-            hearts.push({
-                element: heart,
-                x: parseInt(heart.style.left),
-                y: -30,
-                speed: Math.random() * 2 + 1
-            });
+        // remove heart if below container
+        if (heartRect.top > containerRect.bottom + 50) { // extra margin
+            heart.element.remove();
+            hearts.splice(i, 1);
         }
+    }
+}
 
-        function updateGame() {
-            if (!gameActive) {
-                 // Stop the game loop if not active
-                 return;
-            }
+// ---------- Start / Reset ----------
+function startGame() {
+    if (gameActive) return;
 
-            // Loop through hearts in reverse to safely remove elements
-            for (let i = hearts.length - 1; i >= 0; i--) {
-                const heart = hearts[i];
-                heart.y += heart.speed;
-                heart.element.style.top = heart.y + 'px';
+    // clear any pending spawn timeouts from previous runs
+    spawnTimeouts.forEach(id => clearTimeout(id));
+    spawnTimeouts.length = 0;
 
-                // Check collision with basket
-                const basketRect = {
-                    left: basketPosition,
-                    right: basketPosition + 80, // Basket width
-                    top: gameContainer.offsetHeight - 55, // Basket top position (bottom - height)
-                    bottom: gameContainer.offsetHeight - 15 // Basket bottom position
-                };
+    gameActive = true;
+    score = 0;
+    hearts.forEach(h => { if (h.element) h.element.remove(); });
+    hearts = [];
+    scoreDisplay.textContent = score;
+    gameOverScreen.style.display = 'none';
 
-                const heartRect = {
-                    left: parseInt(heart.element.style.left), // Get current left from style
-                    right: parseInt(heart.element.style.left) + 24, // Heart width
-                    top: heart.y,
-                    bottom: heart.y + 24 // Heart height
-                };
+    // center basket
+    basketPosition = (gameContainer.offsetWidth - basket.offsetWidth) / 2;
+    basket.style.left = basketPosition + 'px';
 
-                if (heartRect.bottom >= basketRect.top && 
-                    heartRect.top <= basketRect.bottom &&
-                    heartRect.right >= basketRect.left && 
-                    heartRect.left <= basketRect.right) {
-                    
-                    // Heart caught!
-                    heart.element.remove();
-                    hearts.splice(i, 1); // Remove from array
-                    score++;
-                    scoreDisplay.textContent = score;
-                    
-                    if (score >= totalHearts) {
-                        gameActive = false;
-                        setTimeout(() => {
-                            gameOverScreen.style.display = 'block';
-                            // Pause game music
-                            backgroundMusic.pause();
-                            musicToggle.textContent = '🔇';
-                            musicPlaying = false;
-                        }, 500);
-                    }
-                }
-                // Remove heart if it goes below screen
-                else if (heart.y > gameContainer.offsetHeight) {
-                    heart.element.remove();
-                    hearts.splice(i, 1); // Remove from array
-                }
-            }
+    // schedule heart spawns and keep IDs so we can cancel them later
+    for (let i = 0; i < totalHearts; i++) {
+        const id = setTimeout(() => {
+            if (gameActive) createHeart();
+        }, i * 1000);
+        spawnTimeouts.push(id);
+    }
 
-            requestAnimationFrame(updateGame); // Continue the loop
-        }
+    if (!gameLoopRunning) {
+        gameLoopRunning = true;
+        updateGame();
+    }
+}
 
-        function resetGame() {
-            gameActive = false;
-            score = 0;
-            hearts = [];
-            scoreDisplay.textContent = score;
-            gameOverScreen.style.display = 'none';
-            document.querySelectorAll('.heart').forEach(heart => heart.remove()); // Remove all heart elements
-            // Reset basket position
-            basketPosition = (gameContainer.offsetWidth - 80) / 2;
-            basket.style.left = basketPosition + 'px';
-        }
+function resetGame() {
+    // clear scheduled spawns
+    spawnTimeouts.forEach(id => clearTimeout(id));
+    spawnTimeouts.length = 0;
 
-        // Touch movement for mobile
-        let isDragging = false;
-        
-        gameContainer.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            isDragging = true;
-            moveBasket(e.touches[0]);
-        });
+    gameActive = false;
+    score = 0;
+    hearts.forEach(h => { if (h.element) h.element.remove(); });
+    hearts = [];
+    scoreDisplay.textContent = score;
+    gameOverScreen.style.display = 'none';
 
-        gameContainer.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            if (isDragging) {
-                moveBasket(e.touches[0]);
-            }
-        });
+    if (gameLoopId) {
+        cancelAnimationFrame(gameLoopId);
+        gameLoopRunning = false;
+    }
 
-        gameContainer.addEventListener('touchend', () => {
-            isDragging = false;
-        });
+    // center basket using actual width
+    basketPosition = (gameContainer.offsetWidth - basket.offsetWidth) / 2;
+    basket.style.left = basketPosition + 'px';
+}
 
-        function moveBasket(touch) {
-            if (!gameActive) return;
-            
-            const containerRect = gameContainer.getBoundingClientRect();
-            const touchX = touch.clientX - containerRect.left;
-            basketPosition = Math.max(0, Math.min(gameContainer.offsetWidth - 80, touchX - 40));
-            basket.style.left = basketPosition + 'px';
-        }
+// make resetGame available to the inline button in HTML
+window.resetGame = resetGame;
+window.startGame = startGame;
 
-        // Initialize
-        createFloatingHearts();
-        updateGame(); // Start the game loop
+// ---------- Pointer (mouse+touch) & keyboard controls ----------
+let isDragging = false;
+let activePointerId = null;
 
-        // Center basket initially
-        setTimeout(() => {
-            basketPosition = (gameContainer.offsetWidth - 80) / 2;
-            basket.style.left = basketPosition + 'px';
-        }, 100);
+function moveBasketByClientX(clientX) {
+    const rect = gameContainer.getBoundingClientRect();
+    const localX = clientX - rect.left;
+    const maxLeft = Math.max(0, gameContainer.clientWidth - basket.offsetWidth);
+    basketPosition = Math.max(0, Math.min(maxLeft, localX - basket.offsetWidth / 2));
+    basket.style.left = basketPosition + 'px';
+}
 
-        // Prevent zoom on double tap
-        document.addEventListener('touchstart', function(e) {
-            if (e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
+gameContainer.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    isDragging = true;
+    activePointerId = e.pointerId;
+    moveBasketByClientX(e.clientX);
+    try { gameContainer.setPointerCapture(activePointerId); } catch (err) {}
+});
 
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', function(e) {
-            const now = (new Date()).getTime();
-            if (now - lastTouchEnd <= 300) {
-                e.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
-    </script>
-</body>
-</html>
+gameContainer.addEventListener('pointermove', (e) => {
+    if (!isDragging || e.pointerId !== activePointerId) return;
+    moveBasketByClientX(e.clientX);
+});
+
+gameContainer.addEventListener('pointerup', (e) => {
+    if (e.pointerId !== activePointerId) return;
+    isDragging = false;
+    try { gameContainer.releasePointerCapture(activePointerId); } catch (err) {}
+    activePointerId = null;
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft' || e.key === 'a') {
+        basketPosition = Math.max(0, basketPosition - 20);
+        basket.style.left = basketPosition + 'px';
+    }
+    if (e.key === 'ArrowRight' || e.key === 'd') {
+        basketPosition = Math.min(gameContainer.clientWidth - basket.offsetWidth, basketPosition + 20);
+        basket.style.left = basketPosition + 'px';
+    }
+    if ((e.key === 'Enter' || e.key === ' ') && !gameActive) {
+        e.preventDefault();
+        startGame();
+    }
+});
+
+// ---------- Init ----------
+function init() {
+    createFloatingHearts();
+
+    // center basket initially using actual offset
+    basketPosition = (gameContainer.offsetWidth - basket.offsetWidth) / 2;
+    basket.style.left = basketPosition + 'px';
+
+    // enforce sensible behavior on resize
+    window.addEventListener('resize', () => {
+        basketPosition = Math.max(0, Math.min(gameContainer.offsetWidth - basket.offsetWidth, basketPosition));
+        basket.style.left = basketPosition + 'px';
+    });
+}
+
+window.addEventListener('load', init);
+</script>

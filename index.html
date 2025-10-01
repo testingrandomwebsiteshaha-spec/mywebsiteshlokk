@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Ahana 💖</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e, #ffb6b6);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #333;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 25px 15px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .apology-text {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            line-height: 1.6;
+            font-size: 1.1em;
+        }
+
+        .game-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .game-title {
+            font-size: 1.8em;
+            color: #ff6b6b;
+            margin-bottom: 15px;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100%;
+            height: 60vh;
+            max-height: 400px;
+            background: linear-gradient(180deg, #87CEEB, #E0F7FF);
+            border: 3px solid #ff6b6b;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 0 auto;
+            touch-action: none;
+        }
+
+        .basket {
+            position: absolute;
+            bottom: 15px;
+            width: 80px;
+            height: 40px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            border-radius: 20px 20px 0 0;
+            transition: left 0.05s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        .basket::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 8px;
+            right: 8px;
+            height: 16px;
+            background: #ff6b6b;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 24px;
+            color: #ff6b6b;
+            user-select: none;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease;
+            z-index: 5;
+        }
+
+        .score-display {
+            font-size: 1.8em;
+            color: #ff6b6b;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        .controls {
+            margin: 15px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            min-width: 120px;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.98);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: none;
+            width: 90%;
+            max-width: 350px;
+            z-index: 20;
+        }
+
+        .game-over h2 {
+            color: #ff6b6b;
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .final-score {
+            font-size: 2.5em;
+            color: #ff6b6b;
+            margin: 15px 0;
+        }
+
+        .love-message {
+            text-align: center;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            margin-top: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .love-message h2 {
+            color: #ff6b6b;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .floating-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-heart {
+            position: absolute;
+            font-size: 16px;
+            color: rgba(255, 107, 107, 0.25);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .music-control {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5em;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .game-container {
+                height: 50vh;
+                max-height: 350px;
+            }
+            
+            .apology-text {
+                padding: 20px;
+                font-size: 1em;
+            }
+            
+            .basket {
+                width: 70px;
+                height: 35px;
+            }
+            
+            .heart {
+                font-size: 20px;
+            }
+            
+            button {
+                padding: 10px 20px;
+                font-size: 1em;
+                min-width: 100px;
+            }
+        }
+
+        /* Prevent text selection */
+        .no-select {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body class="no-select">
+    <div class="floating-hearts" id="floatingHearts"></div>
+    
+    <button class="music-control" id="musicToggle">🎵</button>
+    
+    <div class="container">
+        <div class="header">
+            <h1>💖 For My Ahana 💖</h1>
+            <p>You mean everything to me, and I want to make things right</p>
+        </div>
+
+        <div class="apology-text">
+            <p>My dearest Ahana,</p>
+            <p>I know I've made a mistake, and I'm truly sorry from the bottom of my heart. Every moment without your smile feels incomplete, and I realize how much your happiness means to me.</p>
+            <p>You are the most amazing person I've ever known - your kindness, your laughter, and the way you see the good in everything inspires me every day. I promise to be better, to listen more, and to cherish every moment we share.</p>
+            <p>Please accept this little game as a token of my love and apology. Catch all 25 hearts to show me you're willing to give us another chance.</p>
+            <p>With all my love,</p>
+            <p style="text-align: right; font-weight: bold; margin-top: 20px;">Your Shlok 💕</p>
+        </div>
+
+        <div class="game-section">
+            <h2 class="game-title">💝 Catch My Heart 💝</h2>
+            <div class="score-display">Hearts Caught: <span id="score">0</span>/25</div>
+            <div class="game-container" id="gameContainer">
+                <div class="basket" id="basket"></div>
+                <div class="game-over" id="gameOver">
+                    <h2>🎉 You Did It! 🎉</h2>
+                    <div class="final-score">All 25 Hearts Caught!</div>
+                    <p>Thank you for giving me another chance my love! ❤️</p>
+                    <button onclick="resetGame()">Play Again</button>
+                </div>
+            </div>
+            <div class="controls">
+                <button onclick="startGame()">Start Game</button>
+                <button onclick="resetGame()">Reset Game</button>
+            </div>
+            <p style="margin-top: 10px; font-size: 0.9em;">Touch and move to catch the falling hearts!</p>
+        </div>
+
+        <div class="love-message">
+            <h2>You Complete Me Ahana 💕</h2>
+            <p>No matter what happens, my love for you grows stronger every day. You are my sunshine, my happiness, and my everything.</p>
+            <p style="margin-top: 15px; font-style: italic;">"In your smile, I see something more beautiful than the stars." - Your Shlok</p>
+        </div>
+    </div>
+
+    <audio id="backgroundMusic" loop>
+        <source src="https://audio.jukehost.co.uk/6YJqH5H2jY2Q8J8Q8J8Q8J8Q8J8Q8J8Q8J8Q8J8" type="audio/mpeg">
+        <source src="https://audio.jukehost.co.uk/6YJqH5H2jY2Q8J8Q8J8Q8J8Q8J8Q8J8Q8J8Q8J8" type="audio/ogg">
+    </audio>
+
+    <script>
+        let score = 0;
+        let gameActive = false;
+        let hearts = [];
+        let basketPosition = 0;
+        const totalHearts = 25;
+        const gameContainer = document.getElementById('gameContainer');
+        const basket = document.getElementById('basket');
+        const scoreDisplay = document.getElementById('score');
+        const gameOverScreen = document.getElementById('gameOver');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        const musicToggle = document.getElementById('musicToggle');
+
+        // Music control
+        let musicPlaying = false;
+        musicToggle.addEventListener('click', function() {
+            if (musicPlaying) {
+                backgroundMusic.pause();
+                musicToggle.textContent = '🎵';
+            } else {
+                backgroundMusic.play().catch(e => {
+                    console.log('Audio play failed:', e);
+                    alert('Please interact with the page first to play music');
+                });
+                musicToggle.textContent = '🔊';
+            }
+            musicPlaying = !musicPlaying;
+        });
+
+        // Auto-play music on first interaction
+        document.addEventListener('click', function initAudio() {
+            if (!musicPlaying) {
+                backgroundMusic.play().then(() => {
+                    musicPlaying = true;
+                    musicToggle.textContent = '🔊';
+                }).catch(e => {
+                    console.log('Auto-play failed:', e);
+                });
+            }
+            document.removeEventListener('click', initAudio);
+        }, { once: true });
+
+        // Create floating background hearts
+        function createFloatingHearts() {
+            const container = document.getElementById('floatingHearts');
+            for (let i = 0; i < 15; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'floating-heart';
+                heart.innerHTML = '💖';
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDelay = Math.random() * 6 + 's';
+                heart.style.fontSize = (Math.random() * 15 + 10) + 'px';
+                container.appendChild(heart);
+            }
+        }
+
+        function startGame() {
+            if (gameActive) return;
+            
+            gameActive = true;
+            score = 0;
+            hearts = [];
+            scoreDisplay.textContent = score;
+            gameOverScreen.style.display = 'none';
+            
+            // Clear existing hearts
+            document.querySelectorAll('.heart').forEach(heart => heart.remove());
+            
+            // Create hearts with delays
+            for (let i = 0; i < totalHearts; i++) {
+                setTimeout(() => createHeart(), i * 1000);
+            }
+        }
+
+        function createHeart() {
+            if (!gameActive) return;
+
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerHTML = '💖';
+            const maxLeft = gameContainer.offsetWidth - 30;
+            heart.style.left = Math.random() * maxLeft + 'px';
+            heart.style.top = '-30px';
+            
+            gameContainer.appendChild(heart);
+            hearts.push({
+                element: heart,
+                x: parseInt(heart.style.left),
+                y: -30,
+                speed: Math.random() * 2 + 1
+            });
+        }
+
+        function updateGame() {
+            if (!gameActive) return;
+
+            hearts.forEach((heart, index) => {
+                heart.y += heart.speed;
+                heart.element.style.top = heart.y + 'px';
+
+                // Check collision with basket
+                const basketRect = {
+                    left: basketPosition,
+                    right: basketPosition + 80,
+                    top: gameContainer.offsetHeight - 55,
+                    bottom: gameContainer.offsetHeight - 15
+                };
+
+                const heartRect = {
+                    left: heart.x,
+                    right: heart.x + 24,
+                    top: heart.y,
+                    bottom: heart.y + 24
+                };
+
+                if (heartRect.bottom >= basketRect.top && 
+                    heartRect.top <= basketRect.bottom &&
+                    heartRect.right >= basketRect.left && 
+                    heartRect.left <= basketRect.right) {
+                    
+                    // Heart caught!
+                    heart.element.remove();
+                    hearts.splice(index, 1);
+                    score++;
+                    scoreDisplay.textContent = score;
+                    
+                    // Add catch effect
+                    heart.element.style.transform = 'scale(1.5)';
+                    setTimeout(() => {
+                        if (heart.element.parentNode) {
+                            heart.element.remove();
+                        }
+                    }, 200);
+
+                    // Check win condition
+                    if (score >= totalHearts) {
+                        gameActive = false;
+                        setTimeout(() => {
+                            gameOverScreen.style.display = 'block';
+                        }, 500);
+                    }
+                }
+
+                // Remove heart if it goes below screen
+                if (heart.y > gameContainer.offsetHeight) {
+                    heart.element.remove();
+                    hearts.splice(index, 1);
+                }
+            });
+
+            requestAnimationFrame(updateGame);
+        }
+
+        function resetGame() {
+            gameActive = false;
+            score = 0;
+            hearts = [];
+            scoreDisplay.textContent = score;
+            gameOverScreen.style.display = 'none';
+            document.querySelectorAll('.heart').forEach(heart => heart.remove());
+        }
+
+        // Touch movement for mobile
+        let isDragging = false;
+        
+        gameContainer.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isDragging = true;
+            moveBasket(e.touches[0]);
+        });
+
+        gameContainer.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (isDragging) {
+                moveBasket(e.touches[0]);
+            }
+        });
+
+        gameContainer.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        function moveBasket(touch) {
+            if (!gameActive) return;
+            
+            const containerRect = gameContainer.getBoundingClientRect();
+            const touchX = touch.clientX - containerRect.left;
+            basketPosition = Math.max(0, Math.min(gameContainer.offsetWidth - 80, touchX - 40));
+            basket.style.left = basketPosition + 'px';
+        }
+
+        // Initialize
+        createFloatingHearts();
+        updateGame();
+
+        // Center basket initially
+        setTimeout(() => {
+            basketPosition = (gameContainer.offsetWidth - 80) / 2;
+            basket.style.left = basketPosition + 'px';
+        }, 100);
+
+        // Prevent zoom on double tap
+        document.addEventListener('

@@ -20,9 +20,6 @@
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
         }
-<audio autoplay loop hidden>
-  <source src="music.mp3" type="audio/mpeg">
-</audio>
 
         .container {
             max-width: 100%;
@@ -280,7 +277,7 @@
 <body class="no-select">
     <div class="floating-hearts" id="floatingHearts"></div>
     
-    <button class="music-control" id="musicToggle">🎵</button>
+    <button class="music-control" id="musicToggle">🔊</button>
     
     <div class="container">
         <div class="header">
@@ -289,9 +286,9 @@
         </div>
 
         <div class="apology-text">
-            <p>My dearest Ahana,</p>
+            <p>My dearest pyaaaari Ahuuu💕,</p>
             <p>I know I've made a mistake, and I'm truly sorry from the bottom of my heart. Every moment without your smile feels incomplete, and I realize how much your happiness means to me.</p>
-            <p>You are the most amazing person I've ever known - your kindness, your laughter, and the way you see the good in everything inspires me every day. I promise to be better, to listen more, and to cherish every moment we share.</p>
+            <p>You are the most amazing person I've ever known your kindness, your laughter, and the way you see the good in everything inspires me every day. I promise to be better, to listen more (more mtlab sbkuchhhh) and to cherish every moment we share.</p>
             <p>Please accept this little game as a token of my love and apology. Catch all 25 hearts to show me you're willing to give us another chance.</p>
             <p>With all my love,</p>
             <p style="text-align: right; font-weight: bold; margin-top: 20px;">Your Shlok 💕</p>
@@ -319,13 +316,12 @@
         <div class="love-message">
             <h2>You Complete Me Ahana 💕</h2>
             <p>No matter what happens, my love for you grows stronger every day. You are my sunshine, my happiness, and my everything.</p>
-            <p style="margin-top: 15px; font-style: italic;">"In your smile, I see something more beautiful than the stars." - Your Shlok</p>
+            <p style="margin-top: 15px; font-style: italic;">"In your smile, I see something more beautiful than the stars. please maaf krden madam jii💕💕💕" - Your Shlok</p>
         </div>
     </div>
 
     <audio id="backgroundMusic" loop>
-        <source src="https://audio.jukehost.co.uk/6YJqH5H2jY2Q8J8Q8J8Q8J8Q8J8Q8J8Q8J8Q8J8" type="audio/mpeg">
-        <source src="https://audio.jukehost.co.uk/6YJqH5H2jY2Q8J8Q8J8Q8J8Q8J8Q8J8Q8J8Q8J8" type="audio/ogg">
+        <source src="Blue - (Raag.Fm).mp3" type="audio/mpeg">
     </audio>
 
     <script>
@@ -346,11 +342,10 @@
         musicToggle.addEventListener('click', function() {
             if (musicPlaying) {
                 backgroundMusic.pause();
-                musicToggle.textContent = '🎵';
+                musicToggle.textContent = '🔇';
             } else {
                 backgroundMusic.play().catch(e => {
                     console.log('Audio play failed:', e);
-                    alert('Please interact with the page first to play music');
                 });
                 musicToggle.textContent = '🔊';
             }
@@ -367,8 +362,7 @@
                     console.log('Auto-play failed:', e);
                 });
             }
-            document.removeEventListener('click', initAudio);
-        }, { once: true });
+        });
 
         // Create floating background hearts
         function createFloatingHearts() {
@@ -530,4 +524,20 @@
         }, 100);
 
         // Prevent zoom on double tap
-        document.addEventListener('
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(e) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>

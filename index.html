@@ -286,9 +286,9 @@
         </div>
 
         <div class="apology-text">
-            <p>My dearest pyaaaari Ahuuu💕,</p>
+            <p>My dearest pyaaari Ahuuu💖💖,</p>
             <p>I know I've made a mistake, and I'm truly sorry from the bottom of my heart. Every moment without your smile feels incomplete, and I realize how much your happiness means to me.</p>
-            <p>You are the most amazing person I've ever known your kindness, your laughter, and the way you see the good in everything inspires me every day. I promise to be better, to listen more (more mtlab sbkuchhhh) and to cherish every moment we share.</p>
+            <p>You are the most amazing person I've ever known your kindness, your laughter, and the way you see the good in everything inspires me every day. I promise to be better, to listen more (more mtllab sbkuchhhhh), and to cherish every moment we share. 5 6 din bss fir aarha hu na wapas tbb train date aur bhi bohot kuch hogaa... haan na? please ahuuuu maaf krdoooooo ( aur haa pehli baar kuch aisa try kr rha hu bhul chuuk hojaye kahi prr to advance m maafi mera pehla project hai ye life ka jo aap dekh rhi hain abhi).</p>
             <p>Please accept this little game as a token of my love and apology. Catch all 25 hearts to show me you're willing to give us another chance.</p>
             <p>With all my love,</p>
             <p style="text-align: right; font-weight: bold; margin-top: 20px;">Your Shlok 💕</p>
@@ -315,8 +315,8 @@
 
         <div class="love-message">
             <h2>You Complete Me Ahana 💕</h2>
-            <p>No matter what happens, my love for you grows stronger every day. You are my sunshine, my happiness, and my everything.</p>
-            <p style="margin-top: 15px; font-style: italic;">"In your smile, I see something more beautiful than the stars. please maaf krden madam jii💕💕💕" - Your Shlok</p>
+            <p>No matter what happens, my love for you grows stronger every day. You are my sunshine, my happiness, and my sbkuchhhh💕💕💕💕💕 I LOVEEEEEEE YOUUUUUUUUUU AHANAAAAAAA 💕💕💕💕💕💕🫂🫂🫂🧿🧿🧿🧿🧿🧿.</p>
+            <p style="margin-top: 15px; font-style: italic;">"In your smile, I see something more beautiful than the stars." - Your Shlok</p>
         </div>
     </div>
 
@@ -416,25 +416,30 @@
         }
 
         function updateGame() {
-            if (!gameActive) return;
+            if (!gameActive) {
+                 // Stop the game loop if not active
+                 return;
+            }
 
-            hearts.forEach((heart, index) => {
+            // Loop through hearts in reverse to safely remove elements
+            for (let i = hearts.length - 1; i >= 0; i--) {
+                const heart = hearts[i];
                 heart.y += heart.speed;
                 heart.element.style.top = heart.y + 'px';
 
                 // Check collision with basket
                 const basketRect = {
                     left: basketPosition,
-                    right: basketPosition + 80,
-                    top: gameContainer.offsetHeight - 55,
-                    bottom: gameContainer.offsetHeight - 15
+                    right: basketPosition + 80, // Basket width
+                    top: gameContainer.offsetHeight - 55, // Basket top position (bottom - height)
+                    bottom: gameContainer.offsetHeight - 15 // Basket bottom position
                 };
 
                 const heartRect = {
-                    left: heart.x,
-                    right: heart.x + 24,
+                    left: parseInt(heart.element.style.left), // Get current left from style
+                    right: parseInt(heart.element.style.left) + 24, // Heart width
                     top: heart.y,
-                    bottom: heart.y + 24
+                    bottom: heart.y + 24 // Heart height
                 };
 
                 if (heartRect.bottom >= basketRect.top && 
@@ -444,35 +449,29 @@
                     
                     // Heart caught!
                     heart.element.remove();
-                    hearts.splice(index, 1);
+                    hearts.splice(i, 1); // Remove from array
                     score++;
                     scoreDisplay.textContent = score;
                     
-                    // Add catch effect
-                    heart.element.style.transform = 'scale(1.5)';
-                    setTimeout(() => {
-                        if (heart.element.parentNode) {
-                            heart.element.remove();
-                        }
-                    }, 200);
-
-                    // Check win condition
                     if (score >= totalHearts) {
                         gameActive = false;
                         setTimeout(() => {
                             gameOverScreen.style.display = 'block';
+                            // Pause game music
+                            backgroundMusic.pause();
+                            musicToggle.textContent = '🔇';
+                            musicPlaying = false;
                         }, 500);
                     }
                 }
-
                 // Remove heart if it goes below screen
-                if (heart.y > gameContainer.offsetHeight) {
+                else if (heart.y > gameContainer.offsetHeight) {
                     heart.element.remove();
-                    hearts.splice(index, 1);
+                    hearts.splice(i, 1); // Remove from array
                 }
-            });
+            }
 
-            requestAnimationFrame(updateGame);
+            requestAnimationFrame(updateGame); // Continue the loop
         }
 
         function resetGame() {
@@ -481,7 +480,10 @@
             hearts = [];
             scoreDisplay.textContent = score;
             gameOverScreen.style.display = 'none';
-            document.querySelectorAll('.heart').forEach(heart => heart.remove());
+            document.querySelectorAll('.heart').forEach(heart => heart.remove()); // Remove all heart elements
+            // Reset basket position
+            basketPosition = (gameContainer.offsetWidth - 80) / 2;
+            basket.style.left = basketPosition + 'px';
         }
 
         // Touch movement for mobile
@@ -515,7 +517,7 @@
 
         // Initialize
         createFloatingHearts();
-        updateGame();
+        updateGame(); // Start the game loop
 
         // Center basket initially
         setTimeout(() => {
